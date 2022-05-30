@@ -1,4 +1,4 @@
-defmodule Ecto.PrefixedIDTest do
+defmodule Ecto.PrefixedID.Base64UUIDTest do
   use ExUnit.Case
   doctest Ecto.PrefixedID
 
