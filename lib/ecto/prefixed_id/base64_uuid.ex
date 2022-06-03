@@ -37,7 +37,7 @@ defmodule Ecto.PrefixedID.Base64UUID do
   defp validate_opts(opts) do
     prefix = opts[:prefix]
 
-    if not is_nil(prefix) and (not is_binary(prefix) or byte_size(prefix) != 3) do
+    if not is_binary(prefix) or byte_size(prefix) != 3 do
       raise ArgumentError, "Prefix `#{inspect(prefix)}` is not a 3 character long binary"
     end
   end
@@ -47,10 +47,6 @@ defmodule Ecto.PrefixedID.Base64UUID do
   """
   @impl true
   @spec cast(t | raw | any, opts) :: {:ok, t} | :error
-  def cast(id = <<_b64id::binary-size(22)>>, %{prefix: nil}) do
-    {:ok, id}
-  end
-
   def cast(id = <<prefix::binary-size(3), ?_, _b64id::binary-size(22)>>, %{prefix: prefix}) do
     {:ok, id}
   end
@@ -63,10 +59,6 @@ defmodule Ecto.PrefixedID.Base64UUID do
   """
   @impl true
   @spec dump(t | any, dumper :: function(), opts) :: {:ok, raw} | :error
-  def dump(<<b64id::binary-size(22)>>, _dumper, %{prefix: nil}) do
-    Base.url_decode64(b64id, padding: false)
-  end
-
   def dump(<<prefix::binary-size(3), ?_, b64id::binary-size(22)>>, _dumper, %{prefix: prefix}) do
     Base.url_decode64(b64id, padding: false)
   end
@@ -92,10 +84,6 @@ defmodule Ecto.PrefixedID.Base64UUID do
   end
 
   @spec encode(raw, opts) :: t
-  defp encode(<<_::128>> = raw_uuid, %{prefix: nil}) do
-    Base.url_encode64(raw_uuid, padding: false)
-  end
-
   defp encode(<<_::128>> = raw_uuid, %{prefix: prefix}) do
     prefix <> "_" <> Base.url_encode64(raw_uuid, padding: false)
   end
